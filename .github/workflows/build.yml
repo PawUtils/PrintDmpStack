@@ -1,0 +1,21 @@
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-slim
+    strategy:
+      matrix:
+        conf: ["debug", "release"]
+    steps:
+    - uses: actions/checkout@v5
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 10
+        dotnet-quality: ga
+    - name: Build
+      run: dotnet build -c ${{ matrix.conf }}
