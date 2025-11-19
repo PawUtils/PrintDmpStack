@@ -56,6 +56,12 @@ try
             Console.WriteLine(frame.ToHumanReadable());
         }
     }
+    else
+    {
+        Console.Error.WriteLine("Please specify a valid output format.");
+
+        return -3;
+    }
 
     return 0;
 }
