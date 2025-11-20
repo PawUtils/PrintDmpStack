@@ -30,9 +30,6 @@ sealed class DumpAnalyzer : IDisposable
         return new DumpAnalyzer(root);
     }
 
-    const int E_Fail = unchecked((int)0x80004005);
-    const int E_NoInterface = unchecked((int)0x80004002);
-
     public List<DumpStackFrame> GetExceptionStackTrace()
     {
         var symbols = (IDebugSymbols)Client;
