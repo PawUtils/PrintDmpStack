@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="params.txt" CopyToOutputDirectory="Always" />
-    <None Include="symsrv.yes" CopyToOutputDirectory="Always" />
+    <None Include="params.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="symsrv.yes" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
