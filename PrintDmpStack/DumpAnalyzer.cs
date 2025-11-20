@@ -18,35 +18,14 @@ sealed class DumpAnalyzer : IDisposable
     {
         var root = IDebugClient.Create();
 
-        var hr = root.OpenDumpFile(dumpFile);
+        root.OpenDumpFile(dumpFile);
 
-        if (hr != 0)
-        {
-            throw new COMException(nameof(root.OpenDumpFile), hr);
-        }
-
-        hr = ((IDebugControl)root).WaitForEvent(0, 0);
-
-        if (hr != 0)
-        {
-            throw new COMException(nameof(IDebugControl.WaitForEvent), hr);
-        }
+        ((IDebugControl)root).WaitForEvent(0, 0);
 
         var symbols = (IDebugSymbols)root;
 
-        hr = symbols.SetImagePath(imagePaths);
-
-        if (hr != 0)
-        {
-            throw new COMException(nameof(symbols.SetImagePath), hr);
-        }
-
-        hr = symbols.SetSymbolPath(symbolPaths);
-
-        if (hr != 0)
-        {
-            throw new COMException(nameof(symbols.SetSymbolPath), hr);
-        }
+        symbols.SetImagePath(imagePaths);
+        symbols.SetSymbolPath(symbolPaths);
 
         return new DumpAnalyzer(root);
     }
@@ -59,40 +38,25 @@ sealed class DumpAnalyzer : IDisposable
         var symbols = (IDebugSymbols)Client;
         var control = (IDebugControl4)Client;
 
-        var hr = control.GetStoredEventInformation(out _, out _, out _
-                                                  , null, 0, out var contextSize
-                                                  , null, 0, out var extraInfoSize
-                                                  );
-
-        if (hr != 0)
-        {
-            throw new COMException(nameof(control.GetStoredEventInformation), hr);
-        }
+        control.GetStoredEventInformation(out _, out _, out _
+                                         , null, 0, out var contextSize
+                                         , null, 0, out var extraInfoSize
+                                         );
 
         var context = new byte[contextSize];
         var extraInfo = new byte[extraInfoSize];
-        hr = control.GetStoredEventInformation(out _, out _, out _
-                                              , context, contextSize, out _
-                                              , extraInfo, extraInfoSize, out _
-                                              );
-
-        if (hr != 0)
-        {
-            throw new COMException(nameof(control.GetStoredEventInformation), hr);
-        }
+        control.GetStoredEventInformation(out _, out _, out _
+                                         , context, contextSize, out _
+                                         , extraInfo, extraInfoSize, out _
+                                         );
 
         uint maxFrames = 150;
         byte[] frameContexts = new byte[maxFrames * contextSize];
         DebugStackFrame[] stackFrames = new DebugStackFrame[maxFrames];
-        hr = control.GetContextStackTrace(context, contextSize
-                                         , stackFrames, maxFrames
-                                         , frameContexts, (uint)frameContexts.Length, contextSize
-                                         , out var frames);
-
-        if (hr != 0)
-        {
-            throw new COMException(nameof(control.GetContextStackTrace), hr);
-        }
+        control.GetContextStackTrace(context, contextSize
+                                    , stackFrames, maxFrames
+                                    , frameContexts, (uint)frameContexts.Length, contextSize
+                                    , out var frames);
 
         const int nameSpanSize = 512;
 
@@ -108,53 +72,43 @@ sealed class DumpAnalyzer : IDisposable
             var frame = new DumpStackFrame();
             var pc = frame.InstructionAddress = stackFrames[f].InstructionOffset;
 
-            hr = symbols.GetModuleByOffset(pc, 0, out var moduleIndex, out var moduleBase);
-
-            if (hr != 0)
-            {
-                stackTrace.Add(frame);
-                continue;
-            }
+            symbols.GetModuleByOffset(pc, 0, out var moduleIndex, out var moduleBase);
 
             frame.ModuleBaseAddress = moduleBase;
 
-            var unknownModule = $"<unknown_{moduleBase}>";
-
-            hr = symbols.GetModuleNames(moduleIndex, moduleBase
-                                       , imageNameSpan, nameSpanSize, out var imageNameSize
-                                       , moduleNameSpan, nameSpanSize, out var moduleNameSize
-                                       , loadedImageNameSpan, nameSpanSize, out var loadedImageNameSize
-                                       );
-
-            string imageName, moduleName, loadedImageName;
-
-            if (hr != 0)
+            string loadedImageName;
+            try
             {
-                imageName = moduleName = loadedImageName = unknownModule;
-            }
-            else
-            {
-                imageName = imageNameSpan.GetString(imageNameSize);
-                moduleName = moduleNameSpan.GetString(moduleNameSize);
+                symbols.GetModuleNames(moduleIndex, moduleBase
+                                      , imageNameSpan, nameSpanSize, out var imageNameSize
+                                      , moduleNameSpan, nameSpanSize, out var moduleNameSize
+                                      , loadedImageNameSpan, nameSpanSize, out var loadedImageNameSize
+                                      );
+
+                var imageName = imageNameSpan.GetString(imageNameSize);
+                var moduleName = moduleNameSpan.GetString(moduleNameSize);
                 loadedImageName = loadedImageNameSpan.GetString(loadedImageNameSize);
             }
-
-            frame.ModuleName = loadedImageName;
-            if (String.IsNullOrWhiteSpace(frame.ModuleName))
+            catch (COMException)
             {
-                frame.ModuleName = unknownModule;
+                loadedImageName = $"<unknown_{moduleBase}>";
             }
 
-            hr = symbols.GetNameByOffset(pc, symbolNameSpan, nameSpanSize, out var symbolNameSize, out _);
+            frame.ModuleName = String.IsNullOrWhiteSpace(loadedImageName) ? $"<unknown_{moduleBase}>" : loadedImageName;
 
-            if (hr != 0)
+            try
+            {
+                symbols.GetNameByOffset(pc, symbolNameSpan, nameSpanSize, out var symbolNameSize, out _);
+
+                var symbolName = symbolNameSpan.GetString(symbolNameSize);
+                frame.SymbolName = symbolName.Contains('!') ? symbolName[(symbolName.IndexOf('!') + 1)..] : "<unknown>";
+            }
+            catch (COMException)
             {
                 stackTrace.Add(frame);
                 continue;
             }
 
-            var symbolName = symbolNameSpan.GetString(symbolNameSize);
-            frame.SymbolName = symbolName.Contains('!') ? symbolName[(symbolName.IndexOf('!') + 1)..] : "<unknown>";
             stackTrace.Add(frame);
         }
 
