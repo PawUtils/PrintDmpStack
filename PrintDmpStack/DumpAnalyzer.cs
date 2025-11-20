@@ -69,7 +69,17 @@ sealed class DumpAnalyzer : IDisposable
             var frame = new DumpStackFrame();
             var pc = frame.InstructionAddress = stackFrames[f].InstructionOffset;
 
-            symbols.GetModuleByOffset(pc, 0, out var moduleIndex, out var moduleBase);
+            uint moduleIndex;
+            ulong moduleBase;
+            try
+            {
+                symbols.GetModuleByOffset(pc, 0, out moduleIndex, out moduleBase);
+            }
+            catch (COMException)
+            {
+                stackTrace.Add(frame);
+                continue;
+            }
 
             frame.ModuleBaseAddress = moduleBase;
 
@@ -93,18 +103,21 @@ sealed class DumpAnalyzer : IDisposable
 
             frame.ModuleName = String.IsNullOrWhiteSpace(loadedImageName) ? $"<unknown_{moduleBase}>" : loadedImageName;
 
+            string symbolName;
             try
             {
                 symbols.GetNameByOffset(pc, symbolNameSpan, nameSpanSize, out var symbolNameSize, out _);
 
-                var symbolName = symbolNameSpan.GetString(symbolNameSize);
-                frame.SymbolName = symbolName.Contains('!') ? symbolName[(symbolName.IndexOf('!') + 1)..] : "<unknown>";
+                symbolName = symbolNameSpan.GetString(symbolNameSize);
+                symbolName = symbolName.Contains('!') ? symbolName[(symbolName.IndexOf('!') + 1)..] : "<unknown>";
             }
             catch (COMException)
             {
                 stackTrace.Add(frame);
                 continue;
             }
+
+            frame.SymbolName = symbolName;
 
             stackTrace.Add(frame);
         }
