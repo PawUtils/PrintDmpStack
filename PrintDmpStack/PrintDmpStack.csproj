@@ -14,7 +14,7 @@
   <PropertyGroup>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>DumbPrograms.DmpStack</PackageId>
-    <Version>1.0.2025.929</Version>
+    <Version>1.0.2025.930</Version>
     <Authors>diryboy</Authors>
     <Title>.dmp stack printer</Title>
     <Description>A Windows program to print the stack from a crash dump (.dmp) file</Description>
@@ -25,7 +25,7 @@
   
   <ItemGroup>
     <None Pack="True" Include="../README.md" PackagePath="/"/>
-    <PackageReference Include="DumbPrograms.DbgEng" Version="0.6.2025.929-beta" />
+    <PackageReference Include="DumbPrograms.DbgEng" Version="1.0.2025.929" />
   </ItemGroup>
 
   <ItemGroup>
