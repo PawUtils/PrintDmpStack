@@ -10,8 +10,8 @@
     <PackageId>DumbPrograms.DmpStack</PackageId>
     <Version>1.0</Version>
     <Authors>diryboy</Authors>
-    <Title>.dmp stack printer</Title>
-    <Description>A Windows program to print the stack from a crash dump (.dmp) file</Description>
+    <Title>JSON classes for PrintDmpStack.exe</Title>
+    <Description>JSON serialization related classes to consume the output from PrintDmpStack.exe</Description>
     <RepositoryUrl>https://github.com/DumbPrograms/PrintDmpStack</RepositoryUrl>
     <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
