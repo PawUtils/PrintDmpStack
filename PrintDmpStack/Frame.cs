@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 
-namespace PrintDmpStack;
+namespace DmpStack;
 
 [DebuggerDisplay("{ToHumanReadable()}")]
-public class DumpStackFrame
+public class Frame
 {
     public ulong ModuleBaseAddress { get; set; }
     public ulong InstructionAddress { get; set; }

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text.Json;
-using PrintDmpStack;
+using DmpStack;
 
 if (args.Length < 3)
 {
@@ -42,12 +42,12 @@ try
 
     if (args.Length < 4 || args[3] == "0")
     {
-        JsonSerializer.Serialize(stdOut, stack, DumpStackJsonSerializationContext.Default.DumpStackFrameArray);
+        JsonSerializer.Serialize(stdOut, stack, FramesJsonSerializationContext.Default.FrameArray);
     }
     else if (args[3] == "1")
     {
         var options = new JsonSerializerOptions { WriteIndented = true };
-        JsonSerializer.Serialize(stdOut, stack, new DumpStackJsonSerializationContext(options).DumpStackFrameArray);
+        JsonSerializer.Serialize(stdOut, stack, new FramesJsonSerializationContext(options).FrameArray);
     }
     else if (args[3] == "2")
     {

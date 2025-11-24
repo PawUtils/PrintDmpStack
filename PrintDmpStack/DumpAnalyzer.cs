@@ -2,7 +2,7 @@
 using System.Text;
 using Interop.DbgEng;
 
-namespace PrintDmpStack;
+namespace DmpStack;
 
 sealed class DumpAnalyzer : IDisposable
 {
@@ -30,7 +30,7 @@ sealed class DumpAnalyzer : IDisposable
         return new DumpAnalyzer(root);
     }
 
-    public List<DumpStackFrame> GetExceptionStackTrace()
+    public List<Frame> GetExceptionStackTrace()
     {
         var symbols = (IDebugSymbols)Client;
         var control = (IDebugControl4)Client;
@@ -62,11 +62,11 @@ sealed class DumpAnalyzer : IDisposable
         Span<byte> loadedImageNameSpan = stackalloc byte[nameSpanSize];
         Span<byte> symbolNameSpan = stackalloc byte[nameSpanSize];
 
-        var stackTrace = new List<DumpStackFrame>((int)frames);
+        var stackTrace = new List<Frame>((int)frames);
 
         for (int f = 0; f < frames; f++)
         {
-            var frame = new DumpStackFrame();
+            var frame = new Frame();
             var pc = frame.InstructionAddress = stackFrames[f].InstructionOffset;
 
             uint moduleIndex;

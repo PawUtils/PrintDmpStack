@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>DmpStack</RootNamespace>
+    <TargetFrameworks>net9.0-windows;net10.0-windows</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
@@ -10,7 +11,20 @@
     <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>DumbPrograms.DmpStack</PackageId>
+    <Version>1.0.2025.929</Version>
+    <Authors>diryboy</Authors>
+    <Title>.dmp stack printer</Title>
+    <Description>A Windows program to print the stack from a crash dump (.dmp) file</Description>
+    <RepositoryUrl>https://github.com/DumbPrograms/PrintDmpStack</RepositoryUrl>
+    <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  
   <ItemGroup>
+    <None Pack="True" Include="../README.md" PackagePath="/"/>
     <PackageReference Include="DumbPrograms.DbgEng" Version="0.6.2025.929-beta" />
   </ItemGroup>
 

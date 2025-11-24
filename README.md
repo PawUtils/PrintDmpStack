@@ -1,7 +1,10 @@
 # PrintDmpStack.exe
 A Windows program to print the stack from a crash dump (.dmp) file, using the [Microsoft Debugger Engine](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/introduction).
 
-The primary usage of this program is in automation.
+The primary usage of this program is in automation. So a Nuget package [DumbPrograms.DmpStack](https://www.nuget.org/packages/DumbPrograms.DmpStack/) with the following JSON serialization related classes are also provided.
+
+1. `DmpStack.Frame`
+1. `DmpStack.FramesJsonSerializationContext`
 
 This program is developed in C#, using the interop library [DumbPrograms.DbgEng](https://www.nuget.org/packages/DumbPrograms.DbgEng/).
 
