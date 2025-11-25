@@ -12,7 +12,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="DumbPrograms.DbgEng" Version="1.0.2025.929" />
+    <PackageReference Include="DumbPrograms.DbgEng" Version="1.1.2025.929" />
   </ItemGroup>
 
   <ItemGroup>

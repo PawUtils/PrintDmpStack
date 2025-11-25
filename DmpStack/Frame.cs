@@ -13,5 +13,7 @@ public class Frame
 
     public ulong OffsetInModule => InstructionAddress - ModuleBaseAddress;
 
+    public string? InteropErrorMessage { get; set; }
+
     public string ToHumanReadable() => String.IsNullOrWhiteSpace(ModuleName) ? "<unknown>" : $"{ModuleName}!{SymbolName}";
 }

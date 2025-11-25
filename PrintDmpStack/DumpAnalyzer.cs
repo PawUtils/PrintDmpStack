@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Text;
 using Interop.DbgEng;
 
 namespace DmpStack;
@@ -75,8 +74,9 @@ sealed class DumpAnalyzer : IDisposable
             {
                 symbols.GetModuleByOffset(pc, 0, out moduleIndex, out moduleBase);
             }
-            catch (COMException)
+            catch (Exception ex)
             {
+                frame.InteropErrorMessage = $"GetModuleByOffset: {ex}\n\n";
                 stackTrace.Add(frame);
                 continue;
             }
@@ -96,8 +96,9 @@ sealed class DumpAnalyzer : IDisposable
                 var moduleName = moduleNameSpan.GetString(moduleNameSize);
                 loadedImageName = loadedImageNameSpan.GetString(loadedImageNameSize);
             }
-            catch (COMException)
+            catch (Exception ex)
             {
+                frame.InteropErrorMessage += $"GetModuleNames: {ex}\n\n";
                 loadedImageName = null;
             }
 
@@ -111,8 +112,9 @@ sealed class DumpAnalyzer : IDisposable
                 symbolName = symbolNameSpan.GetString(symbolNameSize);
                 symbolName = symbolName.Contains('!') ? symbolName[(symbolName.IndexOf('!') + 1)..] : "<unknown>";
             }
-            catch (COMException)
+            catch (Exception ex)
             {
+                frame.InteropErrorMessage += $"GetNameByOffset: {ex}\n\n";
                 stackTrace.Add(frame);
                 continue;
             }
