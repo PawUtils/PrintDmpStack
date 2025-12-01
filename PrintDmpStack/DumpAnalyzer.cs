@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Runtime.InteropServices;
+using System.Text;
 using Interop.DbgEng;
 
 namespace DmpStack;
@@ -19,7 +20,11 @@ sealed class DumpAnalyzer : IDisposable
 
         root.OpenDumpFile(dumpFile);
 
-        ((IDebugControl)root).WaitForEvent(0, 0);
+        var hr = ((IDebugControl)root).WaitForEvent(0, 0);
+        if (hr < 0)
+        {
+            throw new COMException("WaitForEvent failed.", hr);
+        }
 
         var symbols = (IDebugSymbols)root;
 
