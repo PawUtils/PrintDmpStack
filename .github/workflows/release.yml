@@ -41,7 +41,7 @@ jobs:
           gh release create ${GITHUB_REF_NAME} \
             --title ${RELEASE_VERSION} \
             --generate-notes \
-            --draft \
+            --draft
         fi
     - uses: actions/download-artifact@v5
     - name: Upload artifacts to release
