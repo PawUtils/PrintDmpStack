@@ -30,4 +30,4 @@ jobs:
     needs: [build]
     steps:
     - uses: actions/download-artifact@v5
-    - run: ll  
+    - run: ls -l
