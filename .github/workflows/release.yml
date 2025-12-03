@@ -1,0 +1,25 @@
+on:
+  push:
+    tags: [v*]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-slim
+    strategy:
+      matrix:
+        rid: [win-x64, win-x86, win-arm64]
+    steps:
+    - uses: actions/checkout@v5
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 10
+        dotnet-quality: ga
+    - name: .NET Publish
+      working-directory: PrintDmpStack
+      run: dotnet publish -c release -r ${{ matrix.rid }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: binaries-${{ matrix.rid }}
+        path: artifacts/publish/PrintDmpStack/release_${{ matrix.rid }}

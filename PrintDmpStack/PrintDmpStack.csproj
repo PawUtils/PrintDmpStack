@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="params.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="params.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" />
     <None Include="symsrv.yes" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
