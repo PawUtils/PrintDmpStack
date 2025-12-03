@@ -21,5 +21,5 @@ jobs:
       run: dotnet publish -c release -r ${{ matrix.rid }}
     - uses: actions/upload-artifact@v4
       with:
-        name: binaries-${{ matrix.rid }}
+        name: binaries_${{ matrix.rid }}
         path: artifacts/publish/PrintDmpStack/release_${{ matrix.rid }}
