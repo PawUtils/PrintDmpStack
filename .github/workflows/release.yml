@@ -36,8 +36,10 @@ jobs:
         RELEASE_VERSION="$(echo ${GITHUB_REF_NAME} | cut -f1 -d-)"
         OLD_TAG=$(gh release ls --json name,tagName | jq -r ".[] | select(.name == \"${RELEASE_VERSION}\") | .tagName")
         if [ -n "$OLD_TAG" ]; then
+          echo "Updating release ${RELEASE_VERSION} to point to new tag ${GITHUB_REF_NAME}"
           gh release edit ${OLD_TAG} --tag ${GITHUB_REF_NAME}
         else
+          echo "Creating new release ${RELEASE_VERSION} pointing to tag ${GITHUB_REF_NAME}"
           gh release create ${GITHUB_REF_NAME} \
             --title ${RELEASE_VERSION} \
             --generate-notes \
