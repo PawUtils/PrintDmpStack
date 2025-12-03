@@ -29,8 +29,8 @@ jobs:
     needs: [build]
     env:
       GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
     steps:
-    - uses: actions/checkout@v5
     - name: Create or update Release for tag
       run: |
         RELEASE_VERSION="$(echo ${GITHUB_REF_NAME} | cut -f1 -d-)"
