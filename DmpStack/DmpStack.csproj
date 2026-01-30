@@ -7,12 +7,12 @@
 
   <PropertyGroup>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageId>DumbPrograms.DmpStack</PackageId>
+    <PackageId>PawUtils.DmpStack</PackageId>
     <Version>1.2</Version>
     <Authors>diryboy</Authors>
     <Title>JSON classes for PrintDmpStack.exe</Title>
     <Description>JSON serialization related classes to consume the output from PrintDmpStack.exe</Description>
-    <RepositoryUrl>https://github.com/DumbPrograms/PrintDmpStack</RepositoryUrl>
+    <RepositoryUrl>https://github.com/PawUtils/PrintDmpStack</RepositoryUrl>
     <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
