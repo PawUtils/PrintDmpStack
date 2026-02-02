@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using Interop.DbgEng;
 
@@ -39,25 +40,27 @@ sealed class DumpAnalyzer : IDisposable
         var symbols = (IDebugSymbols)Client;
         var control = (IDebugControl4)Client;
 
+        var (contextSize, extraInfoSize) = (0U, 0U);
+
         control.GetStoredEventInformation(out _, out _, out _
-                                         , null, 0, out var contextSize
-                                         , null, 0, out var extraInfoSize
+                                         , null, 0, ref contextSize
+                                         , null, 0, ref extraInfoSize
                                          );
 
         var context = new byte[contextSize];
         var extraInfo = new byte[extraInfoSize];
         control.GetStoredEventInformation(out _, out _, out _
-                                         , context, contextSize, out _
-                                         , extraInfo, extraInfoSize, out _
+                                         , context, contextSize, ref Unsafe.NullRef<uint>()
+                                         , extraInfo, extraInfoSize, ref Unsafe.NullRef<uint>()
                                          );
 
-        uint maxFrames = 150;
+        uint frames = 0, maxFrames = 150;
         byte[] frameContexts = new byte[maxFrames * contextSize];
         DebugStackFrame[] stackFrames = new DebugStackFrame[maxFrames];
         control.GetContextStackTrace(context, contextSize
                                     , stackFrames, maxFrames
                                     , frameContexts, (uint)frameContexts.Length, contextSize
-                                    , out var frames);
+                                    , ref frames);
 
         const int nameSpanSize = 512;
 
@@ -73,11 +76,11 @@ sealed class DumpAnalyzer : IDisposable
             var frame = new Frame();
             var pc = frame.InstructionAddress = stackFrames[f].InstructionOffset;
 
-            uint moduleIndex;
-            ulong moduleBase;
+            var moduleIndex = 0U;
+            var moduleBase = 0UL;
             try
             {
-                symbols.GetModuleByOffset(pc, 0, out moduleIndex, out moduleBase);
+                symbols.GetModuleByOffset(pc, 0, ref moduleIndex, ref moduleBase);
             }
             catch (Exception ex)
             {
@@ -91,10 +94,12 @@ sealed class DumpAnalyzer : IDisposable
             string? loadedImageName;
             try
             {
+                var (imageNameSize, moduleNameSize, loadedImageNameSize) = (0U, 0U, 0U);
+
                 symbols.GetModuleNames(moduleIndex, moduleBase
-                                      , imageNameSpan, nameSpanSize, out var imageNameSize
-                                      , moduleNameSpan, nameSpanSize, out var moduleNameSize
-                                      , loadedImageNameSpan, nameSpanSize, out var loadedImageNameSize
+                                      , imageNameSpan, nameSpanSize, ref imageNameSize
+                                      , moduleNameSpan, nameSpanSize, ref moduleNameSize
+                                      , loadedImageNameSpan, nameSpanSize, ref loadedImageNameSize
                                       );
 
                 var imageName = imageNameSpan.GetString(imageNameSize);
@@ -112,7 +117,9 @@ sealed class DumpAnalyzer : IDisposable
             string symbolName;
             try
             {
-                symbols.GetNameByOffset(pc, symbolNameSpan, nameSpanSize, out var symbolNameSize, out _);
+                var symbolNameSize = 0U;
+
+                symbols.GetNameByOffset(pc, symbolNameSpan, nameSpanSize, ref symbolNameSize, ref Unsafe.NullRef<ulong>());
 
                 symbolName = symbolNameSpan.GetString(symbolNameSize);
                 symbolName = symbolName.Contains('!') ? symbolName[(symbolName.IndexOf('!') + 1)..] : "<unknown>";
